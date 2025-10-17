@@ -2,3 +2,4 @@
 - popup / toast using https://github.com/Mijick/Popups
 - vibecode proto + backend
 - loading animation when poking someone
+- notifications 
