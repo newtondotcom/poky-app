@@ -1,6 +1,4 @@
 - SwiftUI Alerts, Action Sheets, Modals and Popovers
-- full screen safari popover : SFSafariViewController
-- full screen alert dialog for signout
 - popup / toast using https://github.com/Mijick/Popups
 - vibecode proto + backend
 - loading animation when poking someone

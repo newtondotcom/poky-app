@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SafariServices
 
 struct AccountView: View {
     @ObservedObject var mockData: MockData
@@ -233,8 +234,8 @@ struct AccountView: View {
         .sheet(isPresented: $showingHapticsTest) {
             HapticsTestSheet()
         }
-        .sheet(isPresented: $showingHelpSupport) {
-            HelpSupportWebView()
+        .fullScreenCover(isPresented: $showingHelpSupport) {
+            SafariView(url: URL(string: "https://google.com")!)
         }
     }
 }
@@ -756,86 +757,21 @@ struct HapticTestButton: View {
     }
 }
 
-// MARK: - Help Support Web View
-struct HelpSupportWebView: View {
-    @Environment(\.dismiss) private var dismiss
-    @State private var isLoading = true
-    @State private var hasError = false
-
-    var body: some View {
-        NavigationView {
-            ZStack {
-                // WebView
-                WebView(
-                    url: URL(string: "https://google.com")!,
-                    isLoading: $isLoading,
-                    hasError: $hasError
-                )
-            }
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("X") {
-                        dismiss()
-                    }
-                }
-            }
-        }
-    }
-}
-
-// MARK: - WebView
-import WebKit
-
-struct WebView: UIViewRepresentable {
+// MARK: - Safari View
+struct SafariView: UIViewControllerRepresentable {
     let url: URL
-    @Binding var isLoading: Bool
-    @Binding var hasError: Bool
 
-    func makeUIView(context: Context) -> WKWebView {
-        let webView = WKWebView()
-        webView.navigationDelegate = context.coordinator
-        return webView
+    func makeUIViewController(context: Context) -> SFSafariViewController {
+        let safariVC = SFSafariViewController(url: url)
+        safariVC.modalPresentationStyle = .fullScreen
+        return safariVC
     }
 
-    func updateUIView(_ webView: WKWebView, context: Context) {
-        let request = URLRequest(url: url)
-        webView.load(request)
-    }
-
-    func makeCoordinator() -> Coordinator {
-        Coordinator(self)
-    }
-
-    class Coordinator: NSObject, WKNavigationDelegate {
-        let parent: WebView
-
-        init(_ parent: WebView) {
-            self.parent = parent
-        }
-
-        func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
-            parent.isLoading = true
-            parent.hasError = false
-        }
-
-        func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-            parent.isLoading = false
-        }
-
-        func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-            parent.isLoading = false
-            parent.hasError = true
-        }
-
-        func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
-            parent.isLoading = false
-            parent.hasError = true
-        }
+    func updateUIViewController(_ uiViewController: SFSafariViewController, context: Context) {
+        // Nothing needed here
     }
 }
 
 #Preview {
     AccountView(mockData: MockData())
 }
-
