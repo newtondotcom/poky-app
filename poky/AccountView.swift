@@ -145,15 +145,6 @@ struct AccountView: View {
                         }
 
                         MenuRow(
-                            icon: "chart.bar.fill",
-                            title: "Statistics",
-                            subtitle: "View detailed poke analytics",
-                            color: .primary
-                        ) {
-                            // Handle statistics
-                        }
-
-                        MenuRow(
                             icon: "questionmark.circle",
                             title: "Help & Support",
                             subtitle: "Get help and contact support",

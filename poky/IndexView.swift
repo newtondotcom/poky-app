@@ -12,7 +12,10 @@ struct IndexView: View {
     @State private var showingUserSheet = false
     @State private var selectedPokeRelation: PokeRelation?
     @State private var showingDeleteConfirmation = false
-
+    
+    // Animation states for recent pokes
+    @State private var recentPokeAnimating: [UUID: Bool] = [:]
+    
     var body: some View {
         NavigationView {
             ScrollView {
@@ -20,12 +23,12 @@ struct IndexView: View {
                     // Header with liquid glass effect
                     VStack(spacing: 16) {
                         HStack {
-                            Text("Poke Someone!")
+                            Text("Poky")
                                 .font(.largeTitle)
                                 .fontWeight(.bold)
                                 .foregroundStyle(.primary)
                             Spacer()
-                            Text("Simply poke your friends")
+                            Text("proudly part of unisson")
                                 .font(.subheadline)
                                 .foregroundStyle(.secondary)
                         }
@@ -62,7 +65,19 @@ struct IndexView: View {
                             ScrollView(.horizontal, showsIndicators: false) {
                                 HStack(spacing: 16) {
                                     ForEach(mockData.pokes.prefix(5)) { poke in
-                                        RecentPokeCard(poke: poke)
+                                        RecentPokeCard(
+                                            poke: poke,
+                                            isAnimating: recentPokeAnimating[poke.id] ?? false,
+                                            onPoke: {
+                                                // Start animation
+                                                recentPokeAnimating[poke.id] = true
+                                                // Simulate animation duration (e.g. 1s), then perform poke action
+                                                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                                                    mockData.sendPoke(from: mockData.currentUser, to: poke.fromUser)
+                                                    recentPokeAnimating[poke.id] = false
+                                                }
+                                            }
+                                        )
                                     }
                                 }
                                 .padding(.horizontal, 20)
@@ -93,8 +108,12 @@ struct IndexView: View {
                                 ForEach(mockData.pokeRelations) { pokeRelation in
                                     PokeRelationRow(
                                         pokeRelation: pokeRelation,
-                                        onPoke: {
-                                            mockData.sendPoke(from: mockData.currentUser, to: pokeRelation.otherUser)
+                                        onPoke: { completion in
+                                            // Show spinner, perform poke after 1s
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                                                mockData.sendPoke(from: mockData.currentUser, to: pokeRelation.otherUser)
+                                                completion()
+                                            }
                                         },
                                         onAvatarTap: {
                                             selectedPokeRelation = pokeRelation
@@ -160,9 +179,10 @@ struct IndexView: View {
 // MARK: - Poke Relation Row
 struct PokeRelationRow: View {
     let pokeRelation: PokeRelation
-    let onPoke: () -> Void
+    let onPoke: (@escaping () -> Void) -> Void
     let onAvatarTap: () -> Void
     @State private var isPressed = false
+    @State private var isLoading = false
 
     var body: some View {
         HStack(spacing: 12) {
@@ -207,32 +227,42 @@ struct PokeRelationRow: View {
             HStack(spacing: 12) {
                 // Poke button (only show if it's your turn)
                 if pokeRelation.isYourTurn {
-                    Button(action: {
-                        onPoke()
-                        withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
-                            isPressed = true
-                        }
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                            withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
-                                isPressed = false
+                    if isLoading {
+                        ProgressView()
+                            .frame(width: 52, height: 32)
+                    } else {
+                        Button(action: {
+                            isLoading = true
+                            onPoke {
+                                // Called after network completes
+                                isLoading = false
                             }
+                            withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+                                isPressed = true
+                            }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+                                    isPressed = false
+                                }
+                            }
+                        }) {
+                            Text("Poke")
+                                .font(.system(size: 14, weight: .semibold))
+                                .foregroundStyle(.green)
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 6)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 16)
+                                        .stroke(.green.opacity(0.4), lineWidth: 1)
+                                        .background(
+                                            RoundedRectangle(cornerRadius: 16)
+                                                .fill(.green.opacity(0.15))
+                                        )
+                                )
                         }
-                    }) {
-                        Text("Poke")
-                            .font(.system(size: 14, weight: .semibold))
-                            .foregroundStyle(.green)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 6)
-                            .background(
-                                RoundedRectangle(cornerRadius: 16)
-                                    .stroke(.green.opacity(0.4), lineWidth: 1)
-                                    .background(
-                                        RoundedRectangle(cornerRadius: 16)
-                                            .fill(.green.opacity(0.15))
-                                    )
-                            )
+                        .scaleEffect(isPressed ? 0.9 : 1.0)
+                        .disabled(isLoading)
                     }
-                    .scaleEffect(isPressed ? 0.9 : 1.0)
                 }
 
                 // Zap Poke Count (bolt icon)
@@ -279,6 +309,9 @@ struct PokeRelationRow: View {
 // MARK: - Recent Poke Card
 struct RecentPokeCard: View {
     let poke: Poke
+    var isAnimating: Bool = false
+    var onPoke: (() -> Void)? = nil
+    @State private var pulse = false
 
     var body: some View {
         VStack(spacing: 8) {
@@ -290,9 +323,23 @@ struct RecentPokeCard: View {
                         Circle()
                             .stroke(.secondary.opacity(0.3), lineWidth: 2)
                     )
+                    .scaleEffect(pulse ? 1.3 : 1.0)
+                    .animation(isAnimating ? .easeOut(duration: 0.4) : .none, value: pulse)
 
                 Text("👆")
                     .font(.title2)
+            }
+            .onTapGesture {
+                if let onPoke = onPoke {
+                    pulse = false
+                    DispatchQueue.main.async {
+                        pulse = true
+                    }
+                    onPoke()
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                        pulse = false
+                    }
+                }
             }
 
             Text(poke.fromUser.displayName)
@@ -316,7 +363,7 @@ struct RecentPokeCard: View {
         )
         .frame(width: 100)
     }
-
+    
     private func timeAgoString(from date: Date) -> String {
         let interval = Date().timeIntervalSince(date)
 
@@ -331,6 +378,7 @@ struct RecentPokeCard: View {
         }
     }
 }
+
 
 // MARK: - Friend Poke Card
 struct FriendPokeCard: View {
