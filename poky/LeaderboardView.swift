@@ -10,12 +10,12 @@ import SwiftUI
 struct LeaderboardView: View {
     @ObservedObject var mockData: MockData
     @State private var selectedTab: LeaderboardTab = .sent
-    
+
     enum LeaderboardTab: String, CaseIterable {
         case sent = "Sent"
         case received = "Received"
         case total = "Total"
-        
+
         var icon: String {
             switch self {
             case .sent: return "hand.point.up.fill"
@@ -24,7 +24,7 @@ struct LeaderboardView: View {
             }
         }
     }
-    
+
     var sortedLeaderboard: [LeaderboardEntry] {
         switch selectedTab {
         case .sent:
@@ -35,7 +35,7 @@ struct LeaderboardView: View {
             return mockData.leaderboard.sorted { ($0.totalPokes + $0.receivedPokes) > ($1.totalPokes + $1.receivedPokes) }
         }
     }
-    
+
     var body: some View {
         NavigationView {
             VStack(spacing: 0) {
@@ -47,14 +47,14 @@ struct LeaderboardView: View {
                                 .font(.largeTitle)
                                 .fontWeight(.bold)
                                 .foregroundStyle(.primary)
-                            
+
                             Text("Top pokers in your network")
                                 .font(.subheadline)
                                 .foregroundStyle(.secondary)
                         }
-                        
+
                         Spacer()
-                        
+
                         // Trophy icon with liquid glass
                         ZStack {
                             RoundedRectangle(cornerRadius: 16)
@@ -64,15 +64,15 @@ struct LeaderboardView: View {
                                     RoundedRectangle(cornerRadius: 16)
                                         .stroke(.white.opacity(0.2), lineWidth: 1)
                                 )
-                            
+
                             Image(systemName: "trophy.fill")
                                 .font(.title2)
-                                .foregroundStyle(.yellow)
+                                .foregroundStyle(.secondary)
                         }
                     }
                     .padding(.horizontal, 20)
                     .padding(.top, 10)
-                    
+
                     // Tab Selector with liquid glass
                     HStack(spacing: 0) {
                         ForEach(LeaderboardTab.allCases, id: \.self) { tab in
@@ -90,12 +90,12 @@ struct LeaderboardView: View {
                 }
                 .background(
                     LinearGradient(
-                        colors: [.clear, .orange.opacity(0.1)],
+                        colors: [.clear, Color.black.opacity(0.08)],
                         startPoint: .top,
                         endPoint: .bottom
                     )
                 )
-                
+
                 // Leaderboard Content
                 ScrollView {
                     LazyVStack(spacing: 12) {
@@ -116,7 +116,7 @@ struct LeaderboardView: View {
                         colors: [
                             Color(.systemBackground),
                             Color(.systemBackground).opacity(0.8),
-                            Color.orange.opacity(0.05)
+                            Color.black.opacity(0.04)
                         ],
                         startPoint: .top,
                         endPoint: .bottom
@@ -133,14 +133,14 @@ struct TabButton: View {
     let tab: LeaderboardView.LeaderboardTab
     let isSelected: Bool
     let onTap: () -> Void
-    
+
     var body: some View {
         Button(action: onTap) {
             HStack(spacing: 8) {
                 Image(systemName: tab.icon)
                     .font(.caption)
                     .foregroundStyle(isSelected ? .white : .primary)
-                
+
                 Text(tab.rawValue)
                     .font(.subheadline)
                     .fontWeight(.semibold)
@@ -152,7 +152,7 @@ struct TabButton: View {
                 RoundedRectangle(cornerRadius: 12)
                     .overlay(
                         RoundedRectangle(cornerRadius: 12)
-                            .stroke(isSelected ? .orange.opacity(0.3) : .white.opacity(0.2), lineWidth: 1)
+                            .stroke(isSelected ? Color.primary.opacity(0.3) : Color.white.opacity(0.2), lineWidth: 1)
                     )
             )
         }
@@ -166,16 +166,16 @@ struct LeaderboardCard: View {
     let rank: Int
     let selectedTab: LeaderboardView.LeaderboardTab
     let isCurrentUser: Bool
-    
+
     private var rankColor: Color {
         switch rank {
-        case 1: return .yellow
-        case 2: return .gray
-        case 3: return .brown
+        case 1: return .primary
+        case 2: return .secondary
+        case 3: return .gray
         default: return .secondary
         }
     }
-    
+
     private var rankIcon: String {
         switch rank {
         case 1: return "crown.fill"
@@ -184,7 +184,7 @@ struct LeaderboardCard: View {
         default: return "\(rank)"
         }
     }
-    
+
     private var displayValue: Int {
         switch selectedTab {
         case .sent: return entry.totalPokes
@@ -192,7 +192,7 @@ struct LeaderboardCard: View {
         case .total: return entry.totalPokes + entry.receivedPokes
         }
     }
-    
+
     var body: some View {
         HStack(spacing: 16) {
             // Rank indicator
@@ -205,7 +205,7 @@ struct LeaderboardCard: View {
                             Circle()
                                 .stroke(rankColor.opacity(0.3), lineWidth: 2)
                         )
-                    
+
                     Image(systemName: rankIcon)
                         .font(.title3)
                         .foregroundStyle(rankColor)
@@ -217,14 +217,14 @@ struct LeaderboardCard: View {
                             Circle()
                                 .stroke(.white.opacity(0.2), lineWidth: 1)
                         )
-                    
+
                     Text("\(rank)")
                         .font(.headline)
                         .fontWeight(.bold)
                         .foregroundStyle(.primary)
                 }
             }
-            
+
             // User info
             VStack(alignment: .leading, spacing: 4) {
                 HStack {
@@ -232,7 +232,7 @@ struct LeaderboardCard: View {
                         .font(.headline)
                         .fontWeight(.semibold)
                         .foregroundStyle(.primary)
-                    
+
                     if isCurrentUser {
                         Text("(You)")
                             .font(.caption)
@@ -240,16 +240,16 @@ struct LeaderboardCard: View {
                             .padding(.vertical, 2)
                             .background(
                                 Capsule()
-                                    .fill(.green.opacity(0.2))
+                                    .fill(.secondary.opacity(0.2))
                             )
-                            .foregroundStyle(.green)
+                            .foregroundStyle(.secondary)
                     }
                 }
-                
+
                 Text("@\(entry.user.username)")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
-                
+
                 HStack(spacing: 16) {
                     HStack(spacing: 4) {
                         Image(systemName: "hand.point.up.fill")
@@ -258,8 +258,8 @@ struct LeaderboardCard: View {
                             .font(.caption)
                             .fontWeight(.medium)
                     }
-                    .foregroundStyle(.green)
-                    
+                    .foregroundStyle(.primary)
+
                     HStack(spacing: 4) {
                         Image(systemName: "hand.point.down.fill")
                             .font(.caption)
@@ -267,19 +267,19 @@ struct LeaderboardCard: View {
                             .font(.caption)
                             .fontWeight(.medium)
                     }
-                    .foregroundStyle(.green)
+                    .foregroundStyle(.secondary)
                 }
             }
-            
+
             Spacer()
-            
+
             // Score display
             VStack(alignment: .trailing, spacing: 4) {
                 Text("\(displayValue)")
                     .font(.title2)
                     .fontWeight(.bold)
-                    .foregroundStyle(isCurrentUser ? .green : .primary)
-                
+                    .foregroundStyle(isCurrentUser ? .primary : .primary)
+
                 Text(selectedTab.rawValue)
                     .font(.caption)
                     .foregroundStyle(.secondary)
@@ -291,7 +291,7 @@ struct LeaderboardCard: View {
                     .fill(.ultraThinMaterial)
                     .overlay(
                         RoundedRectangle(cornerRadius: 12)
-                            .stroke(isCurrentUser ? .green.opacity(0.3) : .white.opacity(0.2), lineWidth: 1)
+                            .stroke(.white.opacity(0.2), lineWidth: 1)
                     )
             )
         }
@@ -301,7 +301,7 @@ struct LeaderboardCard: View {
             RoundedRectangle(cornerRadius: 16)
                 .overlay(
                     RoundedRectangle(cornerRadius: 16)
-                        .stroke(isCurrentUser ? .green.opacity(0.2) : .white.opacity(0.2), lineWidth: 1)
+                        .stroke(.white.opacity(0.2), lineWidth: 1)
                 )
         )
     }
@@ -311,12 +311,12 @@ struct LeaderboardCard: View {
 struct StatsSummaryCard: View {
     let currentUserEntry: LeaderboardEntry
     let selectedTab: LeaderboardView.LeaderboardTab
-    
+
     private var currentRank: Int {
         // This would be calculated based on the current leaderboard
         return currentUserEntry.rank
     }
-    
+
     private var displayValue: Int {
         switch selectedTab {
         case .sent: return currentUserEntry.totalPokes
@@ -324,47 +324,47 @@ struct StatsSummaryCard: View {
         case .total: return currentUserEntry.totalPokes + currentUserEntry.receivedPokes
         }
     }
-    
+
     var body: some View {
         VStack(spacing: 16) {
             HStack {
                 Text("Your Stats")
                     .font(.headline)
                     .fontWeight(.semibold)
-                
+
                 Spacer()
-                
+
                 Text("Rank #\(currentRank)")
                     .font(.caption)
                     .padding(.horizontal, 8)
                     .padding(.vertical, 4)
                     .background(
                         Capsule()
-                            .fill(.green.opacity(0.2))
+                            .fill(.secondary.opacity(0.2))
                     )
-                    .foregroundStyle(.green)
+                    .foregroundStyle(.secondary)
             }
-            
+
             HStack(spacing: 20) {
                 StatItem(
                     title: "Sent",
                     value: currentUserEntry.totalPokes,
                     icon: "hand.point.up.fill",
-                    color: .green
+                    color: .primary
                 )
-                
+
                 StatItem(
                     title: "Received",
                     value: currentUserEntry.receivedPokes,
                     icon: "hand.point.down.fill",
-                    color: .green
+                    color: .secondary
                 )
-                
+
                 StatItem(
                     title: "Total",
                     value: currentUserEntry.totalPokes + currentUserEntry.receivedPokes,
                     icon: "trophy.fill",
-                    color: .orange
+                    color: .primary
                 )
             }
         }
@@ -386,18 +386,18 @@ struct StatItem: View {
     let value: Int
     let icon: String
     let color: Color
-    
+
     var body: some View {
         VStack(spacing: 8) {
             Image(systemName: icon)
                 .font(.title3)
                 .foregroundStyle(color)
-            
+
             Text("\(value)")
                 .font(.headline)
                 .fontWeight(.bold)
                 .foregroundStyle(.primary)
-            
+
             Text(title)
                 .font(.caption)
                 .foregroundStyle(.secondary)
@@ -409,3 +409,4 @@ struct StatItem: View {
 #Preview {
     LeaderboardView(mockData: MockData())
 }
+

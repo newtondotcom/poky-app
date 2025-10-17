@@ -15,11 +15,11 @@ struct AccountView: View {
     @State private var showingHapticsTest = false
     @State private var showingHelpSupport = false
     @State private var showingLogoutConfirmation = false
-    
+
     var currentUserStats: LeaderboardEntry? {
         mockData.leaderboard.first { $0.user.id == mockData.currentUser.id }
     }
-    
+
     var body: some View {
         NavigationView {
             ScrollView {
@@ -36,14 +36,14 @@ struct AccountView: View {
                                         Circle()
                                             .stroke(.white.opacity(0.2), lineWidth: 2)
                                     )
-                                
+
                                 Image(systemName: mockData.currentUser.profileImage)
                                     .font(.system(size: 40))
                                     .foregroundStyle(.primary)
-                                
+
                                 // Online indicator
                                 Circle()
-                                    .fill(.green)
+                                    .fill(.secondary)
                                     .frame(width: 20, height: 20)
                                     .overlay(
                                         Circle()
@@ -51,24 +51,24 @@ struct AccountView: View {
                                     )
                                     .offset(x: 35, y: 35)
                             }
-                            
+
                             VStack(spacing: 8) {
                                 Text(mockData.currentUser.displayName)
                                     .font(.title2)
                                     .fontWeight(.bold)
                                     .foregroundStyle(.primary)
-                                
+
                                 Text("@\(mockData.currentUser.username)")
                                     .font(.subheadline)
                                     .foregroundStyle(.secondary)
-                                
+
                                 Text("Always online and ready to poke!")
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
                                     .multilineTextAlignment(.center)
                             }
                         }
-                        
+
                         // Stats Cards
                         if let stats = currentUserStats {
                             HStack(spacing: 16) {
@@ -76,21 +76,21 @@ struct AccountView: View {
                                     title: "Sent",
                                     value: stats.totalPokes,
                                     icon: "hand.point.up.fill",
-                                    color: .green
+                                    color: .primary
                                 )
-                                
+
                                 StatCard(
                                     title: "Received",
                                     value: stats.receivedPokes,
                                     icon: "hand.point.down.fill",
-                                    color: .green
+                                    color: .primary
                                 )
-                                
+
                                 StatCard(
                                     title: "Rank",
                                     value: stats.rank,
                                     icon: "trophy.fill",
-                                    color: .orange
+                                    color: .secondary
                                 )
                             }
                         }
@@ -99,68 +99,68 @@ struct AccountView: View {
                     .padding(.top, 20)
                     .background(
                         LinearGradient(
-                            colors: [.clear, .green.opacity(0.1)],
+                            colors: [.clear, Color.black.opacity(0.08)],
                             startPoint: .top,
                             endPoint: .bottom
                         )
                     )
-                    
+
                     // Menu Options
                     VStack(spacing: 12) {
                         MenuRow(
                             icon: "person.circle",
                             title: "Edit Profile",
                             subtitle: "Update your information",
-                            color: .green
+                            color: .primary
                         ) {
                             showingEditProfile = true
                         }
-                        
+
                         MenuRow(
                             icon: "gear",
                             title: "Settings",
                             subtitle: "App preferences and notifications",
-                            color: .gray
+                            color: .secondary
                         ) {
                             showingSettings = true
                         }
-                        
+
                         MenuRow(
                             icon: "bell",
                             title: "Notifications",
                             subtitle: "Manage your poke alerts",
-                            color: .orange
+                            color: .primary
                         ) {
                             // Handle notifications
                         }
-                        
+
                         MenuRow(
                             icon: "iphone.radiowaves.left.and.right",
                             title: "Haptics Test",
                             subtitle: "Test different haptic feedback types",
-                            color: .green
+                            color: .secondary
                         ) {
                             showingHapticsTest = true
                         }
-                        
+
                         MenuRow(
                             icon: "chart.bar.fill",
                             title: "Statistics",
                             subtitle: "View detailed poke analytics",
-                            color: .purple
+                            color: .primary
                         ) {
                             // Handle statistics
                         }
-                        
+
                         MenuRow(
                             icon: "questionmark.circle",
                             title: "Help & Support",
                             subtitle: "Get help and contact support",
-                            color: .green
+                            color: .secondary
                         ) {
                             showingHelpSupport = true
                         }
-                        
+
                         MenuRow(
                             icon: "info.circle",
                             title: "About",
@@ -171,7 +171,7 @@ struct AccountView: View {
                         }
                     }
                     .padding(.horizontal, 20)
-                    
+
                     // Sign Out Button
                     Button(action: {
                         showingLogoutConfirmation = true
@@ -204,7 +204,7 @@ struct AccountView: View {
                     colors: [
                         Color(.systemBackground),
                         Color(.systemBackground).opacity(0.8),
-                        Color.green.opacity(0.05)
+                        Color.black.opacity(0.04)
                     ],
                     startPoint: .top,
                     endPoint: .bottom
@@ -250,18 +250,18 @@ struct StatCard: View {
     let value: Int
     let icon: String
     let color: Color
-    
+
     var body: some View {
         VStack(spacing: 8) {
             Image(systemName: icon)
                 .font(.title3)
                 .foregroundStyle(color)
-            
+
             Text("\(value)")
                 .font(.headline)
                 .fontWeight(.bold)
                 .foregroundStyle(.primary)
-            
+
             Text(title)
                 .font(.caption)
                 .foregroundStyle(.secondary)
@@ -283,7 +283,7 @@ struct StatCard: View {
 struct ActivityCard: View {
     let poke: Poke
     let isCurrentUserSender: Bool
-    
+
     var body: some View {
         VStack(spacing: 8) {
             ZStack {
@@ -294,17 +294,17 @@ struct ActivityCard: View {
                         Circle()
                     )
             }
-            
+
             Text(isCurrentUserSender ? "Poked" : "Received")
                 .font(.caption)
                 .fontWeight(.medium)
-                .foregroundStyle(isCurrentUserSender ? .green : .green)
-            
+                .foregroundStyle(.primary)
+
             Text(isCurrentUserSender ? poke.toUser.displayName : poke.fromUser.displayName)
                 .font(.caption2)
                 .lineLimit(1)
                 .foregroundStyle(.primary)
-            
+
             Text(timeAgoString(from: poke.timestamp))
                 .font(.caption2)
                 .foregroundStyle(.secondary)
@@ -321,10 +321,10 @@ struct ActivityCard: View {
         )
         .frame(width: 100)
     }
-    
+
     private func timeAgoString(from date: Date) -> String {
         let interval = Date().timeIntervalSince(date)
-        
+
         if interval < 60 {
             return "Just now"
         } else if interval < 3600 {
@@ -344,33 +344,33 @@ struct MenuRow: View {
     let subtitle: String
     let color: Color
     let action: () -> Void
-    
+
     var body: some View {
         Button(action: action) {
             HStack(spacing: 16) {
                 ZStack {
                     Circle()
-                        .fill(color.opacity(0.2))
+                        .fill(color.opacity(0.15))
                         .frame(width: 40, height: 40)
-                    
+
                     Image(systemName: icon)
                         .font(.title3)
                         .foregroundStyle(color)
                 }
-                
+
                 VStack(alignment: .leading, spacing: 2) {
                     Text(title)
                         .font(.headline)
                         .fontWeight(.medium)
                         .foregroundStyle(.primary)
-                    
+
                     Text(subtitle)
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
-                
+
                 Spacer()
-                
+
                 Image(systemName: "chevron.right")
                     .font(.caption)
                     .foregroundStyle(.secondary)
@@ -396,7 +396,7 @@ struct EditProfileSheet: View {
     @Environment(\.dismiss) private var dismiss
     @State private var displayName = ""
     @State private var username = ""
-    
+
     var body: some View {
         NavigationView {
             VStack(spacing: 24) {
@@ -409,39 +409,39 @@ struct EditProfileSheet: View {
                                 Circle()
                                     .stroke(.white.opacity(0.2), lineWidth: 2)
                             )
-                        
+
                         Image(systemName: user.profileImage)
                             .font(.system(size: 40))
                             .foregroundStyle(.primary)
                     }
-                    
+
                     Text("Tap to change photo")
                         .font(.caption)
-                        .foregroundStyle(.green)
+                        .foregroundStyle(.secondary)
                 }
                 .padding(.top, 20)
-                
+
                 VStack(spacing: 16) {
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Display Name")
                             .font(.headline)
                             .fontWeight(.semibold)
-                        
+
                         TextField("Enter your display name", text: $displayName)
                             .textFieldStyle(RoundedBorderTextFieldStyle())
                     }
-                    
+
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Username")
                             .font(.headline)
                             .fontWeight(.semibold)
-                        
+
                         TextField("Enter your username", text: $username)
                             .textFieldStyle(RoundedBorderTextFieldStyle())
                     }
                 }
                 .padding(.horizontal, 20)
-                
+
                 Spacer()
             }
             .background(Color(.systemBackground))
@@ -452,7 +452,7 @@ struct EditProfileSheet: View {
                         dismiss()
                     }
                 }
-                
+
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Save") {
                         dismiss()
@@ -474,7 +474,7 @@ struct SettingsSheet: View {
     @State private var notificationsEnabled = true
     @State private var soundEnabled = true
     @State private var vibrationEnabled = true
-    
+
     var body: some View {
         NavigationView {
             List {
@@ -483,7 +483,7 @@ struct SettingsSheet: View {
                     Toggle("Sound Effects", isOn: $soundEnabled)
                     Toggle("Vibration", isOn: $vibrationEnabled)
                 }
-                
+
                 Section("Privacy") {
                     NavigationLink("Blocked Users") {
                         Text("Blocked Users")
@@ -492,7 +492,7 @@ struct SettingsSheet: View {
                         Text("Privacy Settings")
                     }
                 }
-                
+
                 Section("App") {
                     NavigationLink("Appearance") {
                         Text("Appearance")
@@ -518,36 +518,36 @@ struct SettingsSheet: View {
 // MARK: - About Sheet
 struct AboutSheet: View {
     @Environment(\.dismiss) private var dismiss
-    
+
     var body: some View {
         NavigationView {
             VStack(spacing: 24) {
                 VStack(spacing: 16) {
                     Image(systemName: "hand.point.up.fill")
                         .font(.system(size: 60))
-                        .foregroundStyle(.green)
-                    
+                        .foregroundStyle(.primary)
+
                     Text("Poky")
                         .font(.largeTitle)
                         .fontWeight(.bold)
-                    
+
                     Text("Version 1.0.0")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }
                 .padding(.top, 40)
-                
+
                 VStack(alignment: .leading, spacing: 16) {
                     Text("About Poky")
                         .font(.headline)
                         .fontWeight(.semibold)
-                    
+
                     Text("Poky is a fun social app that lets you poke your friends and see who's the most active poker in your network. Send different types of pokes and climb the leaderboard!")
                         .font(.body)
                         .foregroundStyle(.secondary)
                 }
                 .padding(.horizontal, 20)
-                
+
                 Spacer()
             }
             .background(Color(.systemBackground))
@@ -566,7 +566,7 @@ struct AboutSheet: View {
 // MARK: - Haptics Test Sheet
 struct HapticsTestSheet: View {
     @Environment(\.dismiss) private var dismiss
-    
+
     var body: some View {
         NavigationView {
             VStack(spacing: 24) {
@@ -575,14 +575,14 @@ struct HapticsTestSheet: View {
                     Text("Haptics Test")
                         .font(.title2)
                         .fontWeight(.bold)
-                    
+
                     Text("Test different types of haptic feedback")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)
                 }
                 .padding(.top, 20)
-                
+
                 // Haptic Test Buttons
                 VStack(spacing: 16) {
                     HapticTestButton(
@@ -591,42 +591,42 @@ struct HapticsTestSheet: View {
                         icon: "hand.tap",
                         hapticType: .light
                     )
-                    
+
                     HapticTestButton(
                         title: "Medium Impact",
                         subtitle: "Standard tap feedback",
                         icon: "hand.point.up",
                         hapticType: .medium
                     )
-                    
+
                     HapticTestButton(
                         title: "Heavy Impact",
                         subtitle: "Strong tap feedback",
                         icon: "hand.raised",
                         hapticType: .heavy
                     )
-                    
+
                     HapticTestButton(
                         title: "Success",
                         subtitle: "Success notification",
                         icon: "checkmark.circle",
                         hapticType: .success
                     )
-                    
+
                     HapticTestButton(
                         title: "Warning",
                         subtitle: "Warning notification",
                         icon: "exclamationmark.triangle",
                         hapticType: .warning
                     )
-                    
+
                     HapticTestButton(
                         title: "Error",
                         subtitle: "Error notification",
                         icon: "xmark.circle",
                         hapticType: .error
                     )
-                    
+
                     HapticTestButton(
                         title: "Selection",
                         subtitle: "Selection feedback",
@@ -635,7 +635,7 @@ struct HapticsTestSheet: View {
                     )
                 }
                 .padding(.horizontal, 20)
-                
+
                 Spacer()
             }
             .background(
@@ -663,9 +663,9 @@ struct HapticTestButton: View {
     let subtitle: String
     let icon: String
     let hapticType: HapticType
-    
+
     @State private var isPressed = false
-    
+
     enum HapticType {
         case light
         case medium
@@ -675,7 +675,7 @@ struct HapticTestButton: View {
         case error
         case selection
     }
-    
+
     var body: some View {
         Button(action: {
             triggerHaptic()
@@ -691,30 +691,30 @@ struct HapticTestButton: View {
             HStack(spacing: 16) {
                 ZStack {
                     Circle()
-                        .fill(.green.opacity(0.2))
+                        .fill(.secondary.opacity(0.15))
                         .frame(width: 50, height: 50)
-                    
+
                     Image(systemName: icon)
                         .font(.title2)
-                        .foregroundStyle(.green)
+                        .foregroundStyle(.secondary)
                 }
-                
+
                 VStack(alignment: .leading, spacing: 4) {
                     Text(title)
                         .font(.headline)
                         .fontWeight(.semibold)
                         .foregroundStyle(.primary)
-                    
+
                     Text(subtitle)
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
-                
+
                 Spacer()
-                
+
                 Image(systemName: "play.circle.fill")
                     .font(.title2)
-                    .foregroundStyle(.green)
+                    .foregroundStyle(.secondary)
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 16)
@@ -730,7 +730,7 @@ struct HapticTestButton: View {
         .buttonStyle(PlainButtonStyle())
         .scaleEffect(isPressed ? 0.95 : 1.0)
     }
-    
+
     private func triggerHaptic() {
         switch hapticType {
         case .light:
@@ -766,7 +766,7 @@ struct HelpSupportWebView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var isLoading = true
     @State private var hasError = false
-    
+
     var body: some View {
         NavigationView {
             ZStack {
@@ -776,52 +776,6 @@ struct HelpSupportWebView: View {
                     isLoading: $isLoading,
                     hasError: $hasError
                 )
-                
-                // Loading indicator
-                /*
-                if isLoading {
-                    VStack(spacing: 16) {
-                        ProgressView()
-                            .scaleEffect(1.2)
-                        
-                        Text("Loading Support...")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(Color(.systemBackground))
-                }
-                 */
-                
-                // Error state
-                /*
-                if hasError {
-                    VStack(spacing: 20) {
-                        Image(systemName: "exclamationmark.triangle")
-                            .font(.system(size: 50))
-                            .foregroundStyle(.orange)
-                        
-                        Text("Unable to Load Support")
-                            .font(.title2)
-                            .fontWeight(.semibold)
-                        
-                        Text("Please check your internet connection and try again.")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                            .multilineTextAlignment(.center)
-                        
-                        Button("Retry") {
-                            isLoading = true
-                            hasError = false
-                        }
-                        .buttonStyle(.borderedProminent)
-                        .tint(.green)
-                    }
-                    .padding(.horizontal, 40)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(Color(.systemBackground))
-                }
-                 */
             }
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -842,43 +796,43 @@ struct WebView: UIViewRepresentable {
     let url: URL
     @Binding var isLoading: Bool
     @Binding var hasError: Bool
-    
+
     func makeUIView(context: Context) -> WKWebView {
         let webView = WKWebView()
         webView.navigationDelegate = context.coordinator
         return webView
     }
-    
+
     func updateUIView(_ webView: WKWebView, context: Context) {
         let request = URLRequest(url: url)
         webView.load(request)
     }
-    
+
     func makeCoordinator() -> Coordinator {
         Coordinator(self)
     }
-    
+
     class Coordinator: NSObject, WKNavigationDelegate {
         let parent: WebView
-        
+
         init(_ parent: WebView) {
             self.parent = parent
         }
-        
+
         func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
             parent.isLoading = true
             parent.hasError = false
         }
-        
+
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
             parent.isLoading = false
         }
-        
+
         func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
             parent.isLoading = false
             parent.hasError = true
         }
-        
+
         func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
             parent.isLoading = false
             parent.hasError = true
