@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
     @StateObject private var mockData = MockData()
-    @State private var selectedTab : Int = 0
+    @StateObject private var notificationManager = NotificationManager.shared
 
     var body: some View {
         TabView {

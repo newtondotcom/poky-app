@@ -2,4 +2,5 @@
 - popup / toast using https://github.com/Mijick/Popups
 - vibecode proto + backend
 - loading animation when poking someone
-- notifications 
+- remove the exact notification after poke request is completed
+- LAAAATER : implement communication interaction for avatars, group names, and Focus breakthrough behaviors
