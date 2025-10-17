@@ -211,6 +211,15 @@ struct AccountView: View {
                 )
             )
             .navigationBarHidden(true)
+            .alert("Sign Out", isPresented: $showingLogoutConfirmation) {
+                Button("Sign Out", role: .destructive) {
+                    // Handle actual sign out logic here
+                    print("User signed out")
+                }
+                Button("Cancel", role: .cancel) { }
+            } message: {
+                Text("Are you sure you want to sign out? You'll need to sign in again to access your poke data.")
+            }
         }
         .sheet(isPresented: $showingEditProfile) {
             EditProfileSheet(user: mockData.currentUser)
@@ -226,20 +235,6 @@ struct AccountView: View {
         }
         .sheet(isPresented: $showingHelpSupport) {
             HelpSupportWebView()
-        }
-        .confirmationDialog(
-            "Sign Out",
-            isPresented: $showingLogoutConfirmation,
-            titleVisibility: .visible
-        ) {
-            Button("Sign Out", role: .destructive) {
-                // Handle actual sign out logic here
-                // For now, we'll just print a message
-                print("User signed out")
-            }
-            Button("Cancel", role: .cancel) { }
-        } message: {
-            Text("Are you sure you want to sign out? You'll need to sign in again to access your poke data.")
         }
     }
 }
@@ -843,3 +838,4 @@ struct WebView: UIViewRepresentable {
 #Preview {
     AccountView(mockData: MockData())
 }
+
