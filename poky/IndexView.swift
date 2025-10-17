@@ -15,23 +15,21 @@ struct IndexView: View {
 
     // Animation states for recent pokes
     @State private var recentPokeAnimating: [UUID: Bool] = [:]
-    // NEW: For poke relation search
-    @State private var pokeRelationSearchText: String = ""
+    @State private var searchText: String = ""
 
     // Filtered poke relations based on search
     var filteredPokeRelations: [PokeRelation] {
-        if pokeRelationSearchText.isEmpty {
+        if searchText.isEmpty {
             return mockData.pokeRelations
         } else {
             return mockData.pokeRelations.filter { relation in
-                relation.otherUser.displayName.localizedCaseInsensitiveContains(pokeRelationSearchText) ||
-                relation.otherUser.username.localizedCaseInsensitiveContains(pokeRelationSearchText)
+                relation.otherUser.displayName.localizedCaseInsensitiveContains(searchText) ||
+                relation.otherUser.username.localizedCaseInsensitiveContains(searchText)
             }
         }
     }
 
     var body: some View {
-        NavigationView {
             ScrollView {
                 VStack(spacing: 20) {
                     // Header with liquid glass effect
@@ -49,13 +47,6 @@ struct IndexView: View {
                         .padding(.horizontal, 20)
                         .padding(.top, 10)
                     }
-                    .background(
-                        LinearGradient(
-                            colors: [.clear, Color.black.opacity(0.08)],
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
-                    )
 
                     // Recent Pokes Section
                     if !mockData.pokes.isEmpty {
@@ -118,32 +109,7 @@ struct IndexView: View {
                             }
                             .padding(.horizontal, 20)
 
-                            // SEARCH BAR
-                            HStack {
-                                Image(systemName: "magnifyingglass")
-                                    .foregroundStyle(.secondary)
-                                TextField("Search poke relations...", text: $pokeRelationSearchText)
-                                    .textFieldStyle(PlainTextFieldStyle())
-                                if !pokeRelationSearchText.isEmpty {
-                                    Button(action: { pokeRelationSearchText = "" }) {
-                                        Image(systemName: "xmark.circle.fill")
-                                            .foregroundStyle(.secondary)
-                                    }
-                                }
-                            }
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 10)
-                            .background(
-                                RoundedRectangle(cornerRadius: 16)
-                                    .fill(.ultraThinMaterial)
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 16)
-                                            .stroke(.secondary.opacity(0.13), lineWidth: 1)
-                                    )
-                            )
-                            .padding(.horizontal, 20)
-
-                            if filteredPokeRelations.isEmpty && !pokeRelationSearchText.isEmpty {
+                            if filteredPokeRelations.isEmpty && !searchText.isEmpty {
                                 VStack(spacing: 16) {
                                     Image(systemName: "person.crop.circle.badge.questionmark")
                                         .font(.system(size: 40))
@@ -178,21 +144,15 @@ struct IndexView: View {
                         }
                     }
                 }
-                .padding(.bottom, 100)
-            }
-            .background(
-                LinearGradient(
-                    colors: [
-                        Color(.systemBackground),
-                        Color(.systemBackground).opacity(0.8),
-                        Color.black.opacity(0.04)
-                    ],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-            )
-            .navigationBarHidden(true)
+                .padding(.bottom ,100)
         }
+        .background(
+            LinearGradient(
+                colors: [.clear, Color.black.opacity(0.08)],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+        )
         .sheet(isPresented: $showingUserSheet) {
             if let pokeRelation = selectedPokeRelation {
                 UserActionSheet(
@@ -367,19 +327,34 @@ struct RecentPokeCard: View {
 
     var body: some View {
         VStack(spacing: 8) {
-            ZStack {
+            ZStack(alignment: .bottomTrailing) {
+                // Avatar circle with pulse animation
                 Circle()
                     .fill(.ultraThinMaterial)
-                    .frame(width: 50, height: 50)
+                    .frame(width: 60, height: 60)
                     .overlay(
                         Circle()
                             .stroke(.secondary.opacity(0.3), lineWidth: 2)
                     )
-                    .scaleEffect(pulse ? 1.3 : 1.0)
+                    .overlay(
+                        // Avatar icon
+                        Image(systemName: poke.fromUser.profileImage)
+                            .font(.system(size: 26))
+                            .foregroundStyle(.white.opacity(0.9))
+                    )
+                    .scaleEffect(pulse ? 1.15 : 1.0)
                     .animation(isAnimating ? .easeOut(duration: 0.4) : .none, value: pulse)
 
-                Text("👆")
-                    .font(.title2)
+                // Bolt badge
+                Circle()
+                    .fill(Color.green)
+                    .frame(width: 20, height: 20)
+                    .overlay(
+                        Image(systemName: "bolt.fill")
+                            .font(.system(size: 10, weight: .bold))
+                            .foregroundColor(.white)
+                    )
+                    .offset(x: 4, y: 4)
             }
             .onTapGesture {
                 if let onPoke = onPoke {
@@ -413,7 +388,7 @@ struct RecentPokeCard: View {
                         .stroke(.white.opacity(0.2), lineWidth: 1)
                 )
         )
-        .frame(width: 100)
+        .frame(width: 110)
     }
     
     private func timeAgoString(from date: Date) -> String {

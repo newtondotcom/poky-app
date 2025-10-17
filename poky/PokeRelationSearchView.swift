@@ -1,4 +1,12 @@
+//
+//  PokeRelationSearchView.swift
+//  poky
+//
+//  Created by Robin Augereau on 17/10/2025.
+//
 
+import Combine
+import SwiftUI
 
 // New: Search for poke relations in the system search tab
 struct PokeRelationSearchView: View {
