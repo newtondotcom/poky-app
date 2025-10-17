@@ -1,5 +1,5 @@
 //
-//  SearchView.swift
+//  AddView.swift
 //  poky
 //
 //  Created by Robin Augereau on 16/10/2025.
@@ -7,19 +7,19 @@
 
 import SwiftUI
 
-struct SearchView: View {
+struct AddView: View {
     @ObservedObject var mockData: MockData
-    @State private var searchText = ""
+    @State private var AddText = ""
     @State private var selectedUser: User?
     @State private var showingUserProfile = false
 
     var filteredUsers: [User] {
-        if searchText.isEmpty {
+        if AddText.isEmpty {
             return mockData.users
         } else {
             return mockData.users.filter { user in
-                user.username.localizedCaseInsensitiveContains(searchText) ||
-                user.displayName.localizedCaseInsensitiveContains(searchText)
+                user.username.localizedCaseInsensitiveContains(AddText) ||
+                user.displayName.localizedCaseInsensitiveContains(AddText)
             }
         }
     }
@@ -27,24 +27,24 @@ struct SearchView: View {
     var body: some View {
         NavigationView {
             VStack(spacing: 0) {
-                // Search Header with liquid glass effect
+                // Add Header with liquid glass effect
                 VStack(spacing: 16) {
                     HStack {
-                        Text("Search Users")
+                        Text("Add Users")
                             .font(.largeTitle)
                             .fontWeight(.bold)
                             .foregroundStyle(.primary)
 
                         Spacer()
 
-                        // Search stats
+                        // Add stats
                         Text("\(mockData.users.count) users")
                             .font(.caption)
                             .padding(.horizontal, 12)
                             .padding(.vertical, 6)
                             .background(
                                 Capsule()
-
+                                    .fill(.ultraThinMaterial)
                                     .overlay(
                                         Capsule()
                                             .stroke(.white.opacity(0.2), lineWidth: 1)
@@ -55,17 +55,17 @@ struct SearchView: View {
                     .padding(.horizontal, 20)
                     .padding(.top, 10)
 
-                    // Search bar with liquid glass
+                    // Add bar with liquid glass and adaptive material
                     HStack {
                         Image(systemName: "magnifyingglass")
                             .foregroundStyle(.secondary)
 
-                        TextField("Search by name or username...", text: $searchText)
+                        TextField("Add by name or username...", text: $AddText)
                             .textFieldStyle(PlainTextFieldStyle())
 
-                        if !searchText.isEmpty {
+                        if !AddText.isEmpty {
                             Button(action: {
-                                searchText = ""
+                                AddText = ""
                             }) {
                                 Image(systemName: "xmark.circle.fill")
                                     .foregroundStyle(.secondary)
@@ -76,10 +76,10 @@ struct SearchView: View {
                     .padding(.vertical, 12)
                     .background(
                         RoundedRectangle(cornerRadius: 16)
-
+                            .fill(.ultraThinMaterial)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 16)
-                                    .stroke(.white.opacity(0.2), lineWidth: 1)
+                                    .stroke(.secondary.opacity(0.15), lineWidth: 1)
                             )
                     )
                     .padding(.horizontal, 20)
@@ -92,8 +92,8 @@ struct SearchView: View {
                     )
                 )
 
-                // Search Results
-                if filteredUsers.isEmpty && !searchText.isEmpty {
+                // Add Results
+                if filteredUsers.isEmpty && !AddText.isEmpty {
                     // No results found
                     VStack(spacing: 20) {
                         Image(systemName: "person.crop.circle.badge.questionmark")
@@ -105,20 +105,19 @@ struct SearchView: View {
                                 .font(.headline)
                                 .fontWeight(.semibold)
 
-                            Text("Try searching with a different name or username")
+                            Text("Try Adding with a different name or username")
                                 .font(.subheadline)
                                 .foregroundStyle(.secondary)
                                 .multilineTextAlignment(.center)
                         }
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(Color(.systemBackground))
                 } else {
                     // Users list
                     ScrollView {
                         LazyVStack(spacing: 12) {
                             ForEach(filteredUsers) { user in
-                                UserSearchCard(
+                                UserAddCard(
                                     user: user,
                                     onTap: {
                                         selectedUser = user
@@ -163,8 +162,8 @@ struct SearchView: View {
     }
 }
 
-// MARK: - User Search Card
-struct UserSearchCard: View {
+// MARK: - User Add Card
+struct UserAddCard: View {
     let user: User
     let onTap: () -> Void
     let onPoke: () -> Void
@@ -175,10 +174,11 @@ struct UserSearchCard: View {
             // Profile Image
             ZStack {
                 Circle()
+                    .fill(.ultraThinMaterial)
                     .frame(width: 50, height: 50)
                     .overlay(
                         Circle()
-                            .stroke(.white.opacity(0.2), lineWidth: 1)
+                            .stroke(.white.opacity(0.18), lineWidth: 1)
                     )
 
                 Image(systemName: user.profileImage)
@@ -232,16 +232,19 @@ struct UserSearchCard: View {
 
             // Action Buttons
             HStack(spacing: 8) {
-                Button(action: onTap) {
+                Button(action: {
+                    onTap()
+                }) {
                     Image(systemName: "person.circle")
                         .font(.title3)
                         .foregroundStyle(.secondary)
                         .padding(8)
                         .background(
                             Circle()
+                                .fill(.ultraThinMaterial)
                                 .overlay(
                                     Circle()
-                                        .stroke(.white.opacity(0.2), lineWidth: 1)
+                                        .stroke(.white.opacity(0.21), lineWidth: 1)
                                 )
                         )
                 }
@@ -279,6 +282,7 @@ struct UserSearchCard: View {
         .padding(.vertical, 16)
         .background(
             RoundedRectangle(cornerRadius: 16)
+                .fill(.ultraThinMaterial)
                 .overlay(
                     RoundedRectangle(cornerRadius: 16)
                         .stroke(.white.opacity(0.2), lineWidth: 1)
@@ -306,6 +310,7 @@ struct UserSearchCard: View {
     }
 }
 
+
 // MARK: - User Profile Sheet
 struct UserProfileSheet: View {
     let user: User
@@ -322,10 +327,11 @@ struct UserProfileSheet: View {
                     VStack(spacing: 16) {
                         ZStack {
                             Circle()
+                                .fill(.ultraThinMaterial)
                                 .frame(width: 100, height: 100)
                                 .overlay(
                                     Circle()
-                                        .stroke(.white.opacity(0.2), lineWidth: 2)
+                                        .stroke(.white.opacity(0.19), lineWidth: 2)
                                 )
 
                             Image(systemName: user.profileImage)
@@ -428,5 +434,5 @@ struct UserProfileSheet: View {
 }
 
 #Preview {
-    SearchView(mockData: MockData())
+    AddView(mockData: MockData())
 }
