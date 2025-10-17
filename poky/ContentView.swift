@@ -21,11 +21,11 @@ struct ContentView: View {
                 }
                 .tag(0)
 
-            // Search Tab
-            SearchView(mockData: mockData)
+            // Add Tab
+            AddView(mockData: mockData)
                 .tabItem {
                     Image(systemName: selectedTab == 1 ? "magnifyingglass.circle.fill" : "magnifyingglass.circle")
-                    Text("Search")
+                    Text("Add")
                 }
                 .tag(1)
 

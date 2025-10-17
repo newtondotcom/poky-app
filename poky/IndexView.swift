@@ -12,10 +12,24 @@ struct IndexView: View {
     @State private var showingUserSheet = false
     @State private var selectedPokeRelation: PokeRelation?
     @State private var showingDeleteConfirmation = false
-    
+
     // Animation states for recent pokes
     @State private var recentPokeAnimating: [UUID: Bool] = [:]
-    
+    // NEW: For poke relation search
+    @State private var pokeRelationSearchText: String = ""
+
+    // Filtered poke relations based on search
+    var filteredPokeRelations: [PokeRelation] {
+        if pokeRelationSearchText.isEmpty {
+            return mockData.pokeRelations
+        } else {
+            return mockData.pokeRelations.filter { relation in
+                relation.otherUser.displayName.localizedCaseInsensitiveContains(pokeRelationSearchText) ||
+                relation.otherUser.username.localizedCaseInsensitiveContains(pokeRelationSearchText)
+            }
+        }
+    }
+
     var body: some View {
         NavigationView {
             ScrollView {
@@ -85,7 +99,7 @@ struct IndexView: View {
                         }
                     }
 
-                    // Poke Relations Section
+                    // --- Poke Relations Section with search ---
                     if !mockData.pokeRelations.isEmpty {
                         VStack(alignment: .leading, spacing: 12) {
                             HStack {
@@ -93,7 +107,7 @@ struct IndexView: View {
                                     .font(.headline)
                                     .fontWeight(.semibold)
                                 Spacer()
-                                Text("\(mockData.pokeRelations.count)")
+                                Text("\(filteredPokeRelations.count)")
                                     .font(.caption)
                                     .padding(.horizontal, 8)
                                     .padding(.vertical, 4)
@@ -104,25 +118,63 @@ struct IndexView: View {
                             }
                             .padding(.horizontal, 20)
 
-                            LazyVStack(spacing: 8) {
-                                ForEach(mockData.pokeRelations) { pokeRelation in
-                                    PokeRelationRow(
-                                        pokeRelation: pokeRelation,
-                                        onPoke: { completion in
-                                            // Show spinner, perform poke after 1s
-                                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                                                mockData.sendPoke(from: mockData.currentUser, to: pokeRelation.otherUser)
-                                                completion()
-                                            }
-                                        },
-                                        onAvatarTap: {
-                                            selectedPokeRelation = pokeRelation
-                                            showingUserSheet = true
-                                        }
-                                    )
+                            // SEARCH BAR
+                            HStack {
+                                Image(systemName: "magnifyingglass")
+                                    .foregroundStyle(.secondary)
+                                TextField("Search poke relations...", text: $pokeRelationSearchText)
+                                    .textFieldStyle(PlainTextFieldStyle())
+                                if !pokeRelationSearchText.isEmpty {
+                                    Button(action: { pokeRelationSearchText = "" }) {
+                                        Image(systemName: "xmark.circle.fill")
+                                            .foregroundStyle(.secondary)
+                                    }
                                 }
                             }
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 10)
+                            .background(
+                                RoundedRectangle(cornerRadius: 16)
+                                    .fill(.ultraThinMaterial)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 16)
+                                            .stroke(.secondary.opacity(0.13), lineWidth: 1)
+                                    )
+                            )
                             .padding(.horizontal, 20)
+
+                            if filteredPokeRelations.isEmpty && !pokeRelationSearchText.isEmpty {
+                                VStack(spacing: 16) {
+                                    Image(systemName: "person.crop.circle.badge.questionmark")
+                                        .font(.system(size: 40))
+                                        .foregroundStyle(.secondary)
+                                    Text("No poke relations found")
+                                        .font(.subheadline)
+                                        .foregroundStyle(.secondary)
+                                }
+                                .padding(.vertical, 24)
+                                .frame(maxWidth: .infinity)
+                            } else {
+                                LazyVStack(spacing: 8) {
+                                    ForEach(filteredPokeRelations) { pokeRelation in
+                                        PokeRelationRow(
+                                            pokeRelation: pokeRelation,
+                                            onPoke: { completion in
+                                                // Show spinner, perform poke after 1s
+                                                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                                                    mockData.sendPoke(from: mockData.currentUser, to: pokeRelation.otherUser)
+                                                    completion()
+                                                }
+                                            },
+                                            onAvatarTap: {
+                                                selectedPokeRelation = pokeRelation
+                                                showingUserSheet = true
+                                            }
+                                        )
+                                    }
+                                }
+                                .padding(.horizontal, 20)
+                            }
                         }
                     }
                 }

@@ -10,10 +10,10 @@ A modern iOS app similar to Facebook Pokes, built with SwiftUI and featuring iOS
 - Quick access to friends for poking
 - Beautiful liquid glass UI with smooth animations
 
-### 🔍 Search Tab
-- Search users by name or username
+### 🔍 Add Tab
+- Add users by name or username
 - View user profiles with detailed information
-- Send pokes directly from search results
+- Send pokes directly from Add results
 - Online/offline status indicators
 
 ### 🏆 Leaderboard Tab
@@ -58,7 +58,7 @@ A modern iOS app similar to Facebook Pokes, built with SwiftUI and featuring iOS
 ### Key Components
 - `Models.swift` - Data models for User, Poke, and Leaderboard
 - `IndexView.swift` - Home screen with poke functionality
-- `SearchView.swift` - User search and discovery
+- `AddView.swift` - User Add and discovery
 - `LeaderboardView.swift` - Rankings and statistics
 - `AccountView.swift` - User profile and settings
 - `ContentView.swift` - Main TabView navigation
