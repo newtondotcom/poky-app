@@ -10,7 +10,6 @@ import SafariServices
 
 struct AccountView: View {
     @ObservedObject var mockData: MockData
-    @State private var showingEditProfile = false
     @State private var showingSettings = false
     @State private var showingAbout = false
     @State private var showingHapticsTest = false
@@ -108,14 +107,6 @@ struct AccountView: View {
 
                     // Menu Options
                     VStack(spacing: 12) {
-                        MenuRow(
-                            icon: "person.circle",
-                            title: "Edit Profile",
-                            subtitle: "Update your information",
-                            color: .primary
-                        ) {
-                            showingEditProfile = true
-                        }
 
                         MenuRow(
                             icon: "gear",
@@ -212,9 +203,6 @@ struct AccountView: View {
             } message: {
                 Text("Are you sure you want to sign out? You'll need to sign in again to access your poke data.")
             }
-        }
-        .sheet(isPresented: $showingEditProfile) {
-            EditProfileSheet(user: mockData.currentUser)
         }
         .sheet(isPresented: $showingSettings) {
             SettingsSheet()
@@ -374,84 +362,6 @@ struct MenuRow: View {
             )
         }
         .buttonStyle(PlainButtonStyle())
-    }
-}
-
-// MARK: - Edit Profile Sheet
-struct EditProfileSheet: View {
-    let user: User
-    @Environment(\.dismiss) private var dismiss
-    @State private var displayName = ""
-    @State private var username = ""
-
-    var body: some View {
-        NavigationView {
-            VStack(spacing: 24) {
-                VStack(spacing: 16) {
-                    ZStack {
-                        Circle()
-                            .fill(.ultraThinMaterial)
-                            .frame(width: 100, height: 100)
-                            .overlay(
-                                Circle()
-                                    .stroke(.white.opacity(0.2), lineWidth: 2)
-                            )
-
-                        Image(systemName: user.profileImage)
-                            .font(.system(size: 40))
-                            .foregroundStyle(.primary)
-                    }
-
-                    Text("Tap to change photo")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-                .padding(.top, 20)
-
-                VStack(spacing: 16) {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Display Name")
-                            .font(.headline)
-                            .fontWeight(.semibold)
-
-                        TextField("Enter your display name", text: $displayName)
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
-                    }
-
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Username")
-                            .font(.headline)
-                            .fontWeight(.semibold)
-
-                        TextField("Enter your username", text: $username)
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
-                    }
-                }
-                .padding(.horizontal, 20)
-
-                Spacer()
-            }
-            .background(Color(.systemBackground))
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancel") {
-                        dismiss()
-                    }
-                }
-
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Save") {
-                        dismiss()
-                    }
-                    .fontWeight(.semibold)
-                }
-            }
-        }
-        .onAppear {
-            displayName = user.displayName
-            username = user.username
-        }
     }
 }
 
